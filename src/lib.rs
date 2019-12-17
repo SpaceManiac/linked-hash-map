@@ -364,6 +364,25 @@ impl<K: Hash + Eq, V, S: BuildHasher> LinkedHashMap<K, V, S> {
         self.map.get(Qey::from_ref(k)).map(|e| unsafe { &(**e).value })
     }
 
+    /// Returns the key-value pair corresponding to the supplied key.
+    ///
+    /// The supplied key may be any borrowed form of the map's key type, but the ordering
+    /// on the borrowed form *must* match the ordering on the key type.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use linked_hash_map::LinkedHashMap;
+    ///
+    /// let mut map = LinkedHashMap::new();
+    /// map.insert(1, "a");
+    /// assert_eq!(map.get_key_value(&1), Some((&1, &"a")));
+    /// assert_eq!(map.get_key_value(&2), None);
+    /// ```
+    pub fn get_key_value<Q: ?Sized>(&self, k: &Q) -> Option<(&K, &V)> where K: Borrow<Q>, Q: Eq + Hash {
+        self.map.get(Qey::from_ref(k)).map(|e| unsafe { (&(**e).key, &(**e).value) })
+    }
+
     /// Returns the mutable reference corresponding to the key in the map.
     ///
     /// # Examples
